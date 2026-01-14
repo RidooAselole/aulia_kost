@@ -11,7 +11,7 @@
     <header class="header">
         <div class="container">
             <div class="logo">
-                <h1>🏠 Kosan Kami</h1>
+                <h1>Aulia Kost</h1>
             </div>
             <nav class="nav">
                 <a href="#home">Beranda</a>
@@ -26,13 +26,13 @@
         <!-- Hero Section -->
         <section id="home" class="hero">
             <div class="hero-image">
-                <img src="{{ asset('images/aulia-kost.jpg') }}" alt="Gedung Kosan Kami">
+                <img src="{{ asset('images/auliakost.jpeg') }}" alt="Aulia Kost">
                 <div class="hero-overlay"></div>
             </div>
             <div class="hero-content">
                 <div class="container">
-                    <h1 class="hero-title">Selamat Datang di Kosan Kami</h1>
-                    <p class="hero-subtitle">16 Kamar nyaman dengan fasilitas lengkap untuk kenyamanan Anda</p>
+                    <h1 class="hero-title">Selamat Datang di Aulia Kost</h1>
+                    <p class="hero-subtitle">Kost Sarijadi Kota Bandung yang nyaman dan aman</p>
                     <a href="#rooms" class="hero-btn">Lihat Kamar Tersedia</a>
                 </div>
             </div>
@@ -51,9 +51,9 @@
         <!-- About Section -->
         <section id="about" class="about-section">
             <div class="container">
-                <h2 class="section-title">Tentang Kosan Kami</h2>
+                <h2 class="section-title">Tentang Aulia Kost</h2>
                 <div class="about-content">
-                    <p>Kosan Kami menyediakan 16 kamar dengan kualitas yang sama, dilengkapi dengan fasilitas lengkap untuk kenyamanan penghuni. Setiap kamar memiliki standar kualitas tinggi dengan harga terjangkau.</p>
+                    <p>Kosan Kami menyediakan kost dan kamar dengan kualitas yang sama, dilengkapi dengan fasilitas lengkap untuk kenyamanan penghuni. Setiap kamar memiliki standar kualitas tinggi dengan harga terjangkau.</p>
                     
                     <!-- Location Info -->
                     <div class="location-info">
@@ -80,11 +80,11 @@
                     <div class="facilities">
                         <h3>Fasilitas:</h3>
                         <ul>
-                            <li>✓ Kamar mandi dalam</li>
+                            <li>✓ Kamar mandi luar</li>
                             <li>✓ WiFi gratis</li>
                             <li>✓ Kasur dan lemari</li>
                             <li>✓ Listrik dan air</li>
-                            <li>✓ Keamanan 24 jam</li>
+                            <li>✓ Dapur bersama</li>
                             <li>✓ Parkir motor</li>
                         </ul>
                     </div>
@@ -98,10 +98,10 @@
                 <h2 class="section-title">Hubungi Kami</h2>
                 <div class="contact-content">
                     <div class="contact-info">
-                        <p><strong>Alamat:</strong> Jl. Contoh No. 123, Kota</p>
-                        <p><strong>Telepon:</strong> (021) 1234-5678</p>
-                        <p><strong>Email:</strong> info@kosankami.com</p>
-                        <p><strong>WhatsApp:</strong> +62 812-3456-7890</p>
+                        <p><strong>Alamat:</strong> Aulia Kost No. 105A, Jl. Sarimanah No.105a, Sarijadi, Sukasari, Bandung City, West Java 40151</p>
+                        <p><strong>Telepon:</strong> +62 812-2328-8620</p>
+                        <p><strong>Email:</strong> aulia.kost@gmail.com</p>
+                        <p><strong>WhatsApp:</strong> +62 812-2328-8620</p>
                     </div>
                 </div>
             </div>
