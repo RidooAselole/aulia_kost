@@ -102,6 +102,9 @@
                         <p><strong>Telepon:</strong> +62 812-2328-8620</p>
                         <p><strong>Email:</strong> aulia.kost@gmail.com</p>
                         <p><strong>WhatsApp:</strong> +62 812-2328-8620</p>
+                        <div class="map-btn-container">
+                            <a href="https://maps.google.com/maps?q=-6.9052,107.6263" target="_blank" class="map-btn">📍 Lihat di Google Maps</a>
+                        </div>
                     </div>
                 </div>
             </div>
