@@ -2,33 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Routing\Controller as BaseController;
 
-class KosanController extends Controller
+class Controller extends BaseController
 {
-    /**
-     * Display the kosan homepage
-     */
-    public function index()
-    {
-        return view('kosan.index');
-    }
-
-    /**
-     * Handle booking request (optional)
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'room_number' => 'required|integer|min:1|max:16',
-        ]);
-
-        // Add your booking logic here
-        // For example: save to database, send notification, etc.
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Booking request received'
-        ]);
-    }
+    use AuthorizesRequests, ValidatesRequests;
 }
