@@ -15,7 +15,8 @@ return new class extends Migration
            $table->id();
             $table->string('nama_kost');
             $table->text('alamat');
-            $table->integer('harga');
+           $table->decimal('harga', 10, 2)->change();
+            $table->enum('status', ['tersedia', 'ditempati'])->default('tersedia')->after('foto');
             $table->string('foto')->nullable();
             $table->timestamps();
         });
@@ -26,6 +27,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kos');
-    }
-};
+       Schema::table('kos', function (Blueprint $table) {
+        $table->dropColumn('status');
+        $table->integer('harga')->change(); // Kembalikan ke integer jika rollback
+    });
+}
+};  
