@@ -14,9 +14,10 @@ class AdminController extends Controller
     {
         return view('admin.login');
     }
-/**
- * Handle login admin
- */
+
+    /**
+     * Handle login admin
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -32,17 +33,33 @@ class AdminController extends Controller
         return back()->withErrors(['Invalid credentials']);
     }
 
-/**
- * Menampilkan dashboard admin
- */
-    public function dashboard()
+    /**
+     * Menampilkan dashboard admin (Frontend Only - No Database)
+     */
+    public function dashboard(Request $request)
     {
-        return view('admin.dashboard');
+        $section = $request->get('section', 'dashboard');
+        
+        // Data dummy untuk tampilan (tidak dari database)
+        $totalRooms = 0;
+        $availableRooms = 0;
+        $occupiedRooms = 0;
+        $rooms = collect([]); // Empty collection
+        $bookings = collect([]); // Empty collection
+
+        return view('admin.dashboard', compact(
+            'section',
+            'totalRooms',
+            'availableRooms',
+            'occupiedRooms',
+            'rooms',
+            'bookings'
+        ));
     }
 
-/**
-*  Logout
-*/
+    /**
+     * Logout
+     */
     public function logout()
     {
         Session::forget('admin_logged_in');
