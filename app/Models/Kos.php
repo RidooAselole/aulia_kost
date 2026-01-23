@@ -12,14 +12,8 @@ class Kos extends Model
     protected $table = 'kos';
 
     // Kolom yang boleh diisi (Mass Assignment)
-    protected $fillable = [
-        'nama_kost',
-        'alamat',
-        'harga',
-        'foto',
-        'status', // Ini fitur kelola kamar yang baru
-    ];
-
+    protected $fillable = ['number', 'harga', 'status', 'penyewa', 'foto'];
+    
     /**
      * Relasi: Satu Kos bisa memiliki banyak Booking
      */

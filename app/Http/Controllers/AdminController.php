@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kos;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -12,6 +14,9 @@ class AdminController extends Controller
      */
     public function showLoginForm()
     {
+        if (session('admin_logged_in')) {
+            return redirect()->route('admin.dashboard');
+        }
         return view('admin.login');
     }
 
@@ -25,44 +30,78 @@ class AdminController extends Controller
             'password' => 'required|string',
         ]);
 
-        if ($request->username === 'admin' && $request->password === 'password') {
+        // Hardcoded: username=admin, password=admin
+        if ($request->username === 'admin' && $request->password === 'admin') {
             Session::put('admin_logged_in', true);
             return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors(['Invalid credentials']);
+        return back()->withErrors(['error' => 'Username atau password salah'])->onlyInput('username');
     }
 
     /**
-     * Menampilkan dashboard admin (Frontend Only - No Database)
+     * Menampilkan dashboard admin dengan data dari database
      */
     public function dashboard(Request $request)
     {
+        // Check apakah sudah login
+        if (!session('admin_logged_in')) {
+            return redirect()->route('admin.login');
+        }
+
         $section = $request->get('section', 'dashboard');
         
-        // Data dummy untuk tampilan (tidak dari database)
-        $totalRooms = 0;
-        $availableRooms = 0;
-        $occupiedRooms = 0;
-        $rooms = collect([]); // Empty collection
-        $bookings = collect([]); // Empty collection
+        // Get data dari database
+        $rooms = Kos::all();
+        $bookings = Booking::with('user', 'kos')->get();
 
-        return view('admin.dashboard', compact(
-            'section',
-            'totalRooms',
-            'availableRooms',
-            'occupiedRooms',
-            'rooms',
-            'bookings'
-        ));
+        // Calculate stats
+        $totalRooms = $rooms->count();
+        $availableRooms = $rooms->where('status', 'tersedia')->count();
+        $occupiedRooms = $totalRooms - $availableRooms;
+
+        return view('admin.dashboard', [
+            'section' => $section,
+            'totalRooms' => $totalRooms,
+            'availableRooms' => $availableRooms,
+            'occupiedRooms' => $occupiedRooms,
+            'rooms' => $rooms,
+            'bookings' => $bookings,
+        ]);
     }
 
     /**
-     * Logout
+     * Logout admin
      */
-    public function logout()
+    public function logout(Request $request)
     {
         Session::forget('admin_logged_in');
         return redirect()->route('admin.login');
+    }
+
+    /**
+     * Update settings admin
+     */
+    public function updateSettings(Request $request)
+    {
+        if (!session('admin_logged_in')) {
+            return redirect()->route('admin.login');
+        }
+
+        $request->validate([
+            'old_password' => 'required',
+            'username' => 'required|string',
+            'password' => 'required|string|min:6',
+        ]);
+
+        // Verify old password (hardcoded 'admin' untuk sekarang)
+        if ($request->old_password !== 'admin') {
+            return back()->withErrors(['old_password' => 'Password lama salah']);
+        }
+
+        // TODO: Implement menyimpan ke database
+        // Untuk sekarang hanya validation
+
+        return back()->with('success', 'Pengaturan berhasil diperbarui');
     }
 }

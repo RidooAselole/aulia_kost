@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kos', function (Blueprint $table) {
-           $table->id();
-            $table->string('nama_kost');
-            $table->text('alamat');
-           $table->decimal('harga', 10, 2)->change();
-            $table->enum('status', ['tersedia', 'ditempati'])->default('tersedia')->after('foto');
+            $table->id();
+            $table->string('number')->unique(); // 105-01, 105-02, dll
+            $table->decimal('harga', 10, 2);
+            $table->enum('status', ['tersedia', 'ditempati'])->default('tersedia');
+            $table->string('penyewa')->nullable();
             $table->string('foto')->nullable();
             $table->timestamps();
         });
@@ -27,9 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-       Schema::table('kos', function (Blueprint $table) {
-        $table->dropColumn('status');
-        $table->integer('harga')->change(); // Kembalikan ke integer jika rollback
-    });
-}
-};  
+        Schema::dropIfExists('kos');
+    }
+};

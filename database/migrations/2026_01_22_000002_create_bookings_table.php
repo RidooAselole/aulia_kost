@@ -11,15 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // SIMPAN DISINI
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('kos_id')->constrained('kos')->onDelete('cascade');
-            $table->enum('status', ['pending', 'approved', 'paid', 'rejected'])->default('pending');
-            $table->decimal('total_harga', 10, 2);
-            $table->timestamp('payment_deadline')->nullable();
+            
+            // Status untuk approval
+            $table->enum('approval_status', ['menunggu', 'disetujui', 'ditolak'])->default('menunggu');
+            
+            // Status untuk pembayaran
+            $table->enum('payment_status', ['unpaid', 'paid'])->default('unpaid');
+            
+            // Tanggal dan harga
+            $table->date('registration_date');
+            $table->date('payment_deadline');
+            $table->decimal('harga', 10, 2);
+            
+            // Catatan dan tracking
+            $table->text('notes')->nullable();
             $table->timestamp('reminded_at')->nullable();
+            
             $table->timestamps();
         });
     }
