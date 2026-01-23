@@ -4,48 +4,109 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Kos;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class BookingController extends Controller
 {
-    // Menampilkan daftar booking untuk Admin
-    public function index()
+    /**
+     * Middleware untuk protect routes
+     */
+    public function __construct()
     {
-        $bookings = Booking::with(['user', 'kos'])->latest()->get();
-        return view('admin.bookings.index', compact('bookings'));
+        $this->middleware(function ($request, $next) {
+            if (!session('admin_logged_in')) {
+                return redirect()->route('admin.login');
+            }
+            return $next($request);
+        });
     }
 
-    // Proses simpan booking baru dari User
+    /**
+     * Store - Tambah booking baru
+     */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
             'kos_id' => 'required|exists:kos,id',
+            'approval_status' => 'required|in:menunggu,disetujui,ditolak',
+            'payment_status' => 'required|in:unpaid,paid',
+            'registration_date' => 'required|date',
+            'payment_deadline' => 'required|date',
+            'harga' => 'required|numeric|min:0',
+            'notes' => 'nullable|string',
         ]);
 
-        $kos = Kos::find($request->kos_id);
+        $booking = Booking::create($validated);
 
-        // Buat data booking
-        Booking::create([
-            'user_id' => Auth::id(), // Mengambil ID user yang sedang login
-            'kos_id' => $kos->id,
-            'status' => 'pending',
-            'total_harga' => $kos->harga,
-            'payment_deadline' => Carbon::now()->addDay(), // Deadline 24 jam dari sekarang
-        ]);
+        // Jika approval_status disetujui, update kamar jadi ditempati
+        if ($booking->approval_status === 'disetujui') {
+            $booking->kos->update([
+                'status' => 'ditempati',
+                'penyewa' => $booking->user->name,
+            ]);
+        }
 
-        return redirect()->back()->with('success', 'Booking berhasil! Silakan lakukan pembayaran sebelum 24 jam.');
+        return redirect()->route('admin.dashboard', ['section' => 'manage-bookings'])
+            ->with('success', 'Booking berhasil ditambahkan');
     }
 
-    // Update status booking (misal: Approved oleh Admin)
-    public function updateStatus(Request $request, $id)
+    /**
+     * Update - Edit booking
+     */
+    public function update(Request $request, Booking $booking)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->update([
-            'status' => $request->status
+        $oldApprovalStatus = $booking->approval_status;
+        
+        $validated = $request->validate([
+            'approval_status' => 'required|in:menunggu,disetujui,ditolak',
+            'payment_status' => 'required|in:unpaid,paid',
+            'payment_deadline' => 'required|date',
+            'notes' => 'nullable|string',
         ]);
 
-        return redirect()->back()->with('success', 'Status booking diperbarui.');
+        $booking->update($validated);
+
+        // Handle approval status change
+        $kos = $booking->kos;
+        
+        if ($booking->approval_status === 'disetujui' && $oldApprovalStatus !== 'disetujui') {
+            // Approval dibuat
+            $kos->update([
+                'status' => 'ditempati',
+                'penyewa' => $booking->user->name,
+            ]);
+        } elseif ($booking->approval_status !== 'disetujui' && $oldApprovalStatus === 'disetujui') {
+            // Approval dibatalkan
+            $kos->update([
+                'status' => 'tersedia',
+                'penyewa' => null,
+            ]);
+        }
+
+        return redirect()->route('admin.dashboard', ['section' => 'manage-bookings'])
+            ->with('success', 'Booking berhasil diperbarui');
+    }
+
+    /**
+     * Destroy - Hapus booking
+     */
+    public function destroy(Booking $booking)
+    {
+        $kos = $booking->kos;
+
+        // Reset kamar jadi tersedia jika booking disetujui
+        if ($booking->approval_status === 'disetujui') {
+            $kos->update([
+                'status' => 'tersedia',
+                'penyewa' => null,
+            ]);
+        }
+
+        $booking->delete();
+
+        return redirect()->route('admin.dashboard', ['section' => 'manage-bookings'])
+            ->with('success', 'Booking berhasil dihapus');
     }
 }

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin System - Debug Info</title>
+    <style>
+        * { font-family: Arial, sans-serif; }
+        body { margin: 20px; }
+        .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        .info { background: #d1ecf1; border-color: #bee5eb; }
+        h2 { color: #333; }
+        code { background: #f5f5f5; padding: 2px 5px; border-radius: 3px; }
+        a { color: #007bff; text-decoration: none; margin: 5px 10px 5px 0; display: inline-block; padding: 8px 12px; border: 1px solid #007bff; border-radius: 3px; }
+        a:hover { background: #007bff; color: white; }
+        .url-test { margin: 10px 0; }
+        .url-test code { display: block; padding: 5px; margin: 5px 0; background: #fff3cd; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Admin Dashboard - Debug Info</h1>
+
+    <div class="card success">
+        <h2>✅ Routes Registered</h2>
+        <p>Admin routes sudah terdaftar di system:</p>
+        <ul>
+            <li><code>GET /admin/login</code> → AdminController@showLoginForm</li>
+            <li><code>POST /admin/login</code> → AdminController@login</li>
+            <li><code>GET /admin/dashboard</code> → AdminController@dashboard</li>
+        </ul>
+    </div>
+
+    <div class="card info">
+        <h2>📍 Access URLs</h2>
+        <p>Pilih salah satu URL untuk akses:</p>
+        
+        <div class="url-test">
+            <strong>Opsi 1: PHP Development Server (RECOMMENDED)</strong>
+            <code>http://127.0.0.1:8000/admin/login</code>
+            <a href="http://127.0.0.1:8000/admin/login">→ Go to Login</a>
+            <a href="http://127.0.0.1:8000/admin/dashboard">→ Go to Dashboard</a>
+        </div>
+
+        <div class="url-test">
+            <strong>Opsi 2: XAMPP Apache (jika pakai Apache)</strong>
+            <code>http://localhost/aulia_kost/public/admin/login</code>
+            <a href="http://localhost/aulia_kost/public/admin/login">→ Go to Login</a>
+            <a href="http://localhost/aulia_kost/public/admin/dashboard">→ Go to Dashboard</a>
+        </div>
+
+        <div class="url-test">
+            <strong>Opsi 3: Direct IP</strong>
+            <code>http://localhost:8000/admin/login</code>
+            <a href="http://localhost:8000/admin/login">→ Go to Login</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🔐 Login Credentials</h2>
+        <p><strong>Username:</strong> <code>admin</code></p>
+        <p><strong>Password:</strong> <code>admin</code></p>
+    </div>
+
+    <div class="card info">
+        <h2>🧪 Test Your Connection</h2>
+        <p>Klik link di bawah untuk test simple route:</p>
+        <a href="http://127.0.0.1:8000/test">→ Test Simple Route</a>
+        <p>Jika test route works tapi admin/login tidak, ada masalah dengan AdminController atau view.</p>
+    </div>
+
+    <div class="card">
+        <h2>💡 Troubleshooting Tips</h2>
+        <ul>
+            <li>Jika masih 404 di Apache: Aktifkan mod_rewrite di httpd.conf</li>
+            <li>Jika pakai PHP dev server: Pastikan sudah jalankan <code>php artisan serve</code></li>
+            <li>Cek console browser (F12) untuk error details</li>
+            <li>Cek file: <code>storage/logs/laravel.log</code></li>
+        </ul>
+    </div>
+
+    <script>
+        console.log('Page loaded at:', new Date().toLocaleTimeString());
+        console.log('Testing basic fetch to /test endpoint...');
+        
+        fetch('/test')
+            .then(r => r.json())
+            .then(d => {
+                console.log('✅ /test endpoint works!', d);
+                document.querySelector('.success').innerHTML += '<p style="color: green;">✓ Server responding correctly</p>';
+            })
+            .catch(e => {
+                console.error('❌ /test endpoint failed:', e);
+                document.querySelector('.error').innerHTML = '<p style="color: red;">✗ Server not responding - check if artisan serve is running</p>';
+            });
+    </script>
+</body>
+</html>

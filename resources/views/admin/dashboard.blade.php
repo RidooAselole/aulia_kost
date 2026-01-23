@@ -99,18 +99,18 @@
                             <tr>
                                 <td>{{ $room->number }}</td>
                                 <td>Rp {{ number_format($room->price, 0, ',', '.') }}</td>
-                                <td>
-                                    <span class="status-badge {{ $room->status == 'tersedia' ? 'status-tersedia' : 'status-ditempati' }}">
-                                        {{ $room->status == 'tersedia' ? 'Tersedia' : 'Ditempati' }}
-                                    </span>
-                                </td>
-                                <td>{{ $room->tenant ?? '-' }}</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button type="button" class="btn btn-primary btn-small" onclick="editRoom({{ $room->id }}, '{{ $room->number }}', {{ $room->price }}, '{{ $room->status }}', '{{ $room->tenant ?? '' }}')">Edit</button>
-                                        <button type="button" class="btn btn-danger btn-small" onclick="alert('Fitur hapus akan tersedia setelah database diimplementasikan')">Hapus</button>
-                                    </div>
-                                </td>
+                            <td>
+                                <span class="status-badge {{ $room->status == 'tersedia' ? 'status-tersedia' : 'status-ditempati' }}">
+                                    {{ $room->status == 'tersedia' ? 'Tersedia' : 'Ditempati' }}
+                                </span>
+                            </td>
+                            <td>{{ $room->tenant ?? '-' }}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-primary btn-small" onclick="editRoom({{ $room->id }}, '{{ $room->number }}', {{ $room->price }}, '{{ $room->status }}', '{{ $room->tenant ?? '' }}')">Edit</button>
+                                    <button type="button" class="btn btn-danger btn-small" onclick="confirmDelete('room', {{ $room->id }})">Hapus</button>
+                                </div>
+                            </td>
                             </tr>
                             @empty
                             <tr>
@@ -151,7 +151,7 @@
                                 <td>
                                     <div class="action-buttons">
                                         <button type="button" class="btn btn-primary btn-small" onclick="editBooking({{ $booking->id }}, '{{ $booking->name }}', '{{ $booking->room_number }}', '{{ $booking->registration_date->format('Y-m-d') }}', '{{ $booking->payment_status }}', '{{ $booking->payment_due->format('Y-m-d') }}', '{{ $booking->notes ?? '' }}')">Edit</button>
-                                        <button type="button" class="btn btn-danger btn-small" onclick="alert('Fitur hapus akan tersedia setelah database diimplementasikan')">Hapus</button>
+                                        <button type="button" class="btn btn-danger btn-small" onclick="confirmDelete('booking', {{ $booking->id }})">Hapus</button>
                                     </div>
                                 </td>
                             </tr>
@@ -195,7 +195,7 @@
                 <h2 id="roomModalTitle">Tambah Kamar Baru</h2>
                 <button type="button" class="modal-close" onclick="document.getElementById('roomModal').classList.add('hidden')">&times;</button>
             </div>
-            <form id="roomForm" class="modal-form" action="#" method="POST" onsubmit="event.preventDefault(); alert('Fitur ini akan tersedia setelah database diimplementasikan'); document.getElementById('roomModal').classList.add('hidden');">
+            <form id="roomForm" class="modal-form" action="{{ route('rooms.store') }}" method="POST">
                 @csrf
                 <input type="hidden" id="roomId" name="room_id">
                 <div class="form-group">
@@ -204,7 +204,7 @@
                 </div>
                 <div class="form-group">
                     <label for="roomPrice">Harga (Rp):</label>
-                    <input type="number" id="roomPrice" name="price" required min="0">
+                    <input type="number" id="roomPrice" name="harga" required min="0">
                 </div>
                 <div class="form-group">
                     <label for="roomStatus">Status:</label>
@@ -215,7 +215,7 @@
                 </div>
                 <div class="form-group">
                     <label for="roomTenant">Nama Penyewa (jika ditempati):</label>
-                    <input type="text" id="roomTenant" name="tenant">
+                    <input type="text" id="roomTenant" name="penyewa">
                 </div>
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-primary">Simpan</button>
@@ -232,9 +232,12 @@
                 <h2>Edit Booking</h2>
                 <button type="button" class="modal-close" onclick="document.getElementById('bookingModal').classList.add('hidden')">&times;</button>
             </div>
-            <form id="bookingForm" class="modal-form" action="#" method="POST" onsubmit="event.preventDefault(); alert('Fitur ini akan tersedia setelah database diimplementasikan'); document.getElementById('bookingModal').classList.add('hidden');">
+            <form id="bookingForm" class="modal-form" method="POST">
                 @csrf
+                @method('PUT')
                 <input type="hidden" id="bookingId" name="booking_id">
+                <input type="hidden" id="bookingKosId" name="kos_id">
+                <input type="hidden" id="bookingUserId" name="user_id">
                 <div class="form-group">
                     <label for="bookingName">Nama Penyewa:</label>
                     <input type="text" id="bookingName" name="name" required disabled>
@@ -248,6 +251,14 @@
                     <input type="date" id="bookingRegDate" name="registration_date" required disabled>
                 </div>
                 <div class="form-group">
+                    <label for="bookingApprovalStatus">Status Pendaftaran:</label>
+                    <select id="bookingApprovalStatus" name="approval_status" required>
+                        <option value="menunggu">Menunggu Disetujui</option>
+                        <option value="disetujui">Disetujui</option>
+                        <option value="ditolak">Ditolak</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="bookingPaymentStatus">Status Pembayaran:</label>
                     <select id="bookingPaymentStatus" name="payment_status" required>
                         <option value="unpaid">Belum Bayar</option>
@@ -256,7 +267,7 @@
                 </div>
                 <div class="form-group">
                     <label for="bookingPaymentDue">Tenggat Pembayaran:</label>
-                    <input type="date" id="bookingPaymentDue" name="payment_due" required>
+                    <input type="date" id="bookingPaymentDue" name="payment_deadline" required>
                 </div>
                 <div class="form-group">
                     <label for="bookingNotes">Catatan:</label>
@@ -302,6 +313,7 @@
             document.getElementById('bookingName').value = name;
             document.getElementById('bookingRoom').value = roomNumber;
             document.getElementById('bookingRegDate').value = regDate;
+            document.getElementById('bookingApprovalStatus').value = 'disetujui';
             document.getElementById('bookingPaymentStatus').value = paymentStatus;
             document.getElementById('bookingPaymentDue').value = paymentDue;
             document.getElementById('bookingNotes').value = notes || '';

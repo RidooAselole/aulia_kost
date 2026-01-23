@@ -50,7 +50,7 @@ class User extends Authenticatable
     /**
      * RELASI: Satu User bisa memiliki banyak data Booking
      */
-    public function bookings(): HasMany
+    public function bookings()
     {
         return $this->hasMany(Booking::class);
     }
