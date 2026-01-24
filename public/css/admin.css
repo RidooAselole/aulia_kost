@@ -224,6 +224,7 @@
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
+    overflow: visible;
 }
 .booking-table th {
     background: var(--bg-cream);
@@ -498,6 +499,89 @@
     color: #155724;
 }
 
+/* DEADLINE STATUS COLORS - Payment Row Highlighting */
+.deadline-badge {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+}
+
+.deadline-normal {
+    background: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.deadline-urgent {
+    background: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.deadline-overdue {
+    background: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+/* Color-code entire row based on deadline status */
+.booking-table tbody tr.deadline-normal {
+    background: rgba(212, 237, 218, 0.3);
+}
+
+.booking-table tbody tr.deadline-urgent {
+    background: rgba(255, 193, 7, 0.2);
+}
+
+.booking-table tbody tr.deadline-overdue {
+    background: rgba(248, 215, 218, 0.3);
+}
+
+.booking-table tbody tr.deadline-normal:hover {
+    background: rgba(212, 237, 218, 0.5);
+}
+
+.booking-table tbody tr.deadline-urgent:hover {
+    background: rgba(255, 193, 7, 0.3);
+}
+
+.booking-table tbody tr.deadline-overdue:hover {
+    background: rgba(248, 215, 218, 0.5);
+}
+
+/* APPROVAL STATUS BADGES */
+.approval-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 100px;
+}
+
+.approval-pending {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+}
+
+.approval-approved {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #28a745;
+}
+
+.approval-rejected {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #dc3545;
+}
+
 .status-pending {
     background: #cfe2ff;
     color: #084298;
@@ -522,13 +606,17 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    pointer-events: auto;
 }
 
 .action-buttons .btn {
-    flex: 1;
-    min-width: 70px;
-    font-size: 0.85rem;
     padding: 8px 12px;
+    font-size: 0.85rem;
+    min-width: 60px;
+    white-space: nowrap;
+    cursor: pointer;
+    pointer-events: auto;
+    border: none;
 }
 
 /* TOOLBAR */

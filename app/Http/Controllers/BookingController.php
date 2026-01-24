@@ -10,19 +10,6 @@ use Illuminate\Http\Request;
 class BookingController extends Controller
 {
     /**
-     * Middleware untuk protect routes
-     */
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (!session('admin_logged_in')) {
-                return redirect()->route('admin.login');
-            }
-            return $next($request);
-        });
-    }
-
-    /**
      * Store - Tambah booking baru
      */
     public function store(Request $request)
@@ -96,17 +83,84 @@ class BookingController extends Controller
     {
         $kos = $booking->kos;
 
-        // Reset kamar jadi tersedia jika booking disetujui
-        if ($booking->approval_status === 'disetujui') {
-            $kos->update([
-                'status' => 'tersedia',
-                'penyewa' => null,
-            ]);
-        }
+        // Selalu reset kamar jadi tersedia ketika booking dihapus
+        // Regardless of approval status, clear the tenant
+        $kos->update([
+            'status' => 'tersedia',
+            'penyewa' => null,
+        ]);
 
         $booking->delete();
 
         return redirect()->route('admin.dashboard', ['section' => 'manage-bookings'])
             ->with('success', 'Booking berhasil dihapus');
+    }
+
+    /**
+     * Store From Web - Simpan booking dari form website (public)
+     * Method ini dipanggil via AJAX dari halaman home
+     */
+    public function storeFromWeb(Request $request)
+    {
+        // Validasi input dari form
+        $validated = $request->validate([
+            'fullName' => 'required|string|min:3|max:255',
+            'email' => 'required|email|max:255',
+            'phone' => 'required|string|regex:/^[0-9]{10,13}$/',
+            'roomNumber' => 'required|string|exists:kos,number',
+        ]);
+
+        try {
+            // Cari kamar berdasarkan nomor
+            $kos = Kos::where('number', $validated['roomNumber'])->firstOrFail();
+
+            // Cari atau buat user berdasarkan email
+            $user = User::firstOrCreate(
+                ['email' => $validated['email']],
+                [
+                    'name' => $validated['fullName'],
+                    'email' => $validated['email'],
+                    'no_hp' => $validated['phone'],
+                    'password' => bcrypt('temporary_password_' . uniqid()),
+                ]
+            );
+
+            // Update nama dan no_hp jika sudah ada tapi infonya berbeda
+            if ($user->name !== $validated['fullName'] || $user->no_hp !== $validated['phone']) {
+                $user->update([
+                    'name' => $validated['fullName'],
+                    'no_hp' => $validated['phone'],
+                ]);
+            }
+
+            // Buat booking baru dengan status "menunggu" (pending approval)
+            $booking = Booking::create([
+                'user_id' => $user->id,
+                'kos_id' => $kos->id,
+                'approval_status' => 'menunggu',  // Menunggu approval dari admin
+                'payment_status' => 'unpaid',     // Belum bayar
+                'registration_date' => now()->toDateString(),
+                'payment_deadline' => now()->addMonth()->toDateString(),  // Deadline 1 bulan dari hari ini
+                'harga' => $kos->harga,
+                'notes' => 'Booking dari website - menunggu konfirmasi WhatsApp',
+            ]);
+
+            // Return response JSON dengan data booking
+            return response()->json([
+                'success' => true,
+                'message' => 'Booking berhasil disimpan! Silakan hubungi kami via WhatsApp untuk konfirmasi.',
+                'booking' => [
+                    'id' => $booking->id,
+                    'room_number' => $kos->number,
+                    'user_name' => $user->name,
+                ]
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+            ], 400);
+        }
     }
 }

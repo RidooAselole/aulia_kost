@@ -2,16 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kos;
 use Illuminate\Http\Request;
 
 class KosanController extends Controller
 {
     /**
-     * Display the kosan homepage
+     * Display the kosan homepage dengan data dari database
      */
     public function index()
     {
-        return view('kosan.index');
+        // Ambil semua data kamar dari database
+        $rooms = Kos::all();
+
+        return view('kosan.home', [
+            'rooms' => $rooms
+        ]);
     }
 
     /**

@@ -11,9 +11,10 @@ Route::get('welcome', function () {
     return view('welcome');
 });
 
-Route::get('/', function () {
-    return view('kosan/home');
-})->name('home');
+Route::get('/', [KosanController::class, 'index'])->name('home');
+
+// Booking submission route (public)
+Route::post('/bookings/create', [BookingController::class, 'storeFromWeb'])->name('bookings.create-web');
 
 // Test route
 Route::get('/test', function () {
@@ -27,23 +28,21 @@ Route::get('admin/login', [AdminController::class, 'showLoginForm'])->name('admi
 Route::post('admin/login', [AdminController::class, 'login'])->name('admin.login.post');
 
 // ============ ADMIN PROTECTED ROUTES ============
-Route::match(['get', 'post'], 'admin', [AdminController::class, 'dashboard']);
-Route::match(['get', 'post'], 'admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-Route::post('admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
-Route::post('admin/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+Route::group(['prefix' => 'admin', 'middleware' => 'auth.admin'], function () {
+    Route::match(['get', 'post'], '', [AdminController::class, 'dashboard']);
+    Route::match(['get', 'post'], 'dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
+    Route::post('settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
 
-// ============ KOS (ROOMS) ROUTES ============
-Route::get('admin/rooms', [KosController::class, 'index'])->name('rooms.index');
-Route::prefix('admin/rooms')->group(function () {
-    Route::post('/', [KosController::class, 'store'])->name('rooms.store');
-    Route::put('/{kos}', [KosController::class, 'update'])->name('rooms.update');
-    Route::delete('/{kos}', [KosController::class, 'destroy'])->name('rooms.destroy');
-});
+    // ============ KOS (ROOMS) ROUTES ============
+    Route::get('rooms', [KosController::class, 'index'])->name('rooms.index');
+    Route::post('rooms', [KosController::class, 'store'])->name('rooms.store');
+    Route::put('rooms/{kos}', [KosController::class, 'update'])->name('rooms.update');
+    Route::delete('rooms/{kos}', [KosController::class, 'destroy'])->name('rooms.destroy');
 
-// ============ BOOKING ROUTES ============
-Route::get('admin/bookings', [BookingController::class, 'index'])->name('bookings.index');
-Route::prefix('admin/bookings')->group(function () {
-    Route::post('/', [BookingController::class, 'store'])->name('bookings.store');
-    Route::put('/{booking}', [BookingController::class, 'update'])->name('bookings.update');
-    Route::delete('/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
+    // ============ BOOKING ROUTES ============
+    Route::get('bookings', [BookingController::class, 'index'])->name('bookings.index');
+    Route::post('bookings', [BookingController::class, 'store'])->name('bookings.store');
+    Route::put('bookings/{booking}', [BookingController::class, 'update'])->name('bookings.update');
+    Route::delete('bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
 });

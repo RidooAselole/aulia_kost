@@ -1,8 +1,6 @@
 // Kosan Website JavaScript
-// Global variables
+// Global variables - Sekarang menggunakan data dari blade template
 let roomsData = [];
-let currentHouseNumber = null;
-const price = 600000; // Harga per bulan
 const facilities = [
     'Kamar mandi luar',
     'WiFi gratis',
@@ -11,12 +9,6 @@ const facilities = [
     'Dapur bersama',
     'Parkir motor'
 ];
-
-// House configuration
-const houseConfig = {
-    '105': { totalRooms: 10, name: 'No. 105' },
-    '121': { totalRooms: 6, name: 'No. 121' }
-};
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -29,10 +21,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeBookingModal = document.querySelector('.close-booking');
     const selectedRoomNumberInput = document.getElementById('selectedRoomNumber');
     
-    // WhatsApp number (format: 6281234567890 tanpa + dan -)
-    const whatsappNumber = '+62 812-2328-8620';
+    // WhatsApp number - Format: country code + number tanpa + dan spasi
+    // Contoh: 6281223288620 (untuk +62 812-2328-8620)
+    const whatsappNumber = '6281223288620';
 
-    // Event listeners
+    // Define close modal function at function scope
+    const closeModalFunc = function() {
+        roomModal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+    };
+
+    // Event listeners for room modal
     closeModal.addEventListener('click', closeModalFunc);
 
     window.addEventListener('click', function(event) {
@@ -40,9 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
             closeModalFunc();
         }
     });
-
-    // Initialize house selection on page load
-    backToHouseSelection();
 
     // Smooth scrolling for navigation links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -58,64 +54,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Close modal function
-    function closeModalFunc() {
-        roomModal.classList.remove('show');
-        document.body.style.overflow = 'auto';
-    }
-
     // Format price to Indonesian Rupiah
     window.formatPrice = function(price) {
         return new Intl.NumberFormat('id-ID').format(price);
     };
 
-    // Create room card element
-    window.createRoomCard = function(room) {
-        const card = document.createElement('div');
-        card.className = 'room-card';
-
-        const statusClass = room.status === 'available' ? 'status-available' : 'status-occupied';
-        const statusText = room.status === 'available' ? 'Tersedia' : 'Terisi';
-
-        card.innerHTML = `
-            <div class="room-image">🏠</div>
-            <div class="room-info">
-                <div class="room-number">Kamar ${room.number}</div>
-                <span class="room-status ${statusClass}">${statusText}</span>
-                <div class="room-price">Rp ${formatPrice(room.price)}/bulan</div>
-                <ul class="room-features">
-                    ${room.facilities.slice(0, 3).map(facility => `<li>✓ ${facility}</li>`).join('')}
-                </ul>
-                <button class="room-btn">Lihat Detail</button>
-            </div>
-        `;
-
-        // Add click event only to the button
-        const button = card.querySelector('.room-btn');
-        button.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openModal(room);
-        });
-
-        return card;
-    };
-
     // Open modal with room details
     window.openModal = function(room) {
-        const statusClass = room.status === 'available' ? 'status-available' : 'status-occupied';
-        const statusText = room.status === 'available' ? 'Tersedia' : 'Terisi';
+        const statusClass = room.status === 'tersedia' ? 'status-available' : 'status-occupied';
+        const statusText = room.status === 'tersedia' ? 'Tersedia' : 'Terisi';
 
         modalBody.innerHTML = `
             <h2>Detail Kamar ${room.number}</h2>
             <p><strong>Status:</strong> <span class="room-status ${statusClass}">${statusText}</span></p>
-            <p><strong>Harga:</strong> Rp ${formatPrice(room.price)} per bulan</p>
+            <p><strong>Harga:</strong> Rp ${formatPrice(room.harga)} per bulan</p>
             <p><strong>Ukuran:</strong> 3x4 meter</p>
             <h3>Fasilitas:</h3>
             <ul class="modal-features">
-                ${room.facilities.map(facility => `<li>✓ ${facility}</li>`).join('')}
+                ${facilities.map(facility => `<li>✓ ${facility}</li>`).join('')}
             </ul>
             <p><strong>Deskripsi:</strong> Kamar nyaman dengan kualitas terjamin, dilengkapi dengan semua fasilitas yang dibutuhkan untuk kenyamanan Anda. Semua kamar memiliki standar kualitas yang sama.</p>
-            ${room.status === 'available' ? `
+            ${room.status === 'tersedia' ? `
                 <button class="modal-btn" onclick="handleBooking('${room.number}')">Pesan Sekarang</button>
             ` : `
                 <button class="modal-btn" style="background-color: #9ca3af; cursor: not-allowed;" disabled>Kamar Tidak Tersedia</button>
@@ -218,33 +177,97 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Get room data
-        const room = roomsData.find(r => r.number === formData.roomNumber);
-        const roomPrice = room ? formatPrice(room.price) : '';
+        // Disable submit button to prevent double submission
+        const submitBtn = bookingForm.querySelector('button[type="submit"]');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Menyimpan...';
 
-        // Create WhatsApp message
-        const message = encodeURIComponent(
-            `Halo, saya ingin memesan kamar dengan detail sebagai berikut:\n\n` +
-            `📋 *Data Pribadi:*\n` +
-            `Nama Lengkap: ${formData.fullName}\n` +
-            `Email: ${formData.email}\n` +
-            `Nomor Telepon: ${formData.phone}\n\n` +
-            `🏠 *Detail Pemesanan:*\n` +
-            `Kamar: ${formData.roomNumber}\n` +
-            `Harga: Rp ${roomPrice} per bulan\n\n` +
-            `Saya tertarik untuk memesan kamar ini. Terima kasih.`
-        );
+        // Save booking to database via AJAX
+        fetch('/bookings/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                fullName: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                roomNumber: formData.roomNumber
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Booking saved successfully, now redirect to WhatsApp
+                const bookingId = data.booking.id;
+                const timestamp = new Date().toLocaleDateString('id-ID', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
-        // Redirect to WhatsApp
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
-        window.open(whatsappUrl, '_blank');
-        
-        // Close modal after a short delay
-        setTimeout(() => {
-            closeBookingModalFunc();
-        }, 500);
+                const message = encodeURIComponent(
+                    `*🏠 PERMINTAAN PEMESANAN KAMAR - AULIA KOST*\n` +
+                    `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+                    `📌 *ID Booking:* #BK${bookingId}\n` +
+                    `⏰ *Waktu Permintaan:* ${timestamp}\n\n` +
+                    `👤 *DATA PENYEWA:*\n` +
+                    `├─ Nama: ${formData.fullName}\n` +
+                    `├─ Email: ${formData.email}\n` +
+                    `└─ Telepon: ${formData.phone}\n\n` +
+                    `🏘️ *DETAIL KAMAR:*\n` +
+                    `├─ Nomor Kamar: ${formData.roomNumber}\n` +
+                    `└─ Status: Menunggu Konfirmasi\n\n` +
+                    `💬 *LANGKAH SELANJUTNYA:*\n` +
+                    `1. Admin akan merespon dalam 1x24 jam\n` +
+                    `2. Verifikasi data dan ketersediaan kamar\n` +
+                    `3. Diskusi detail (harga, fasilitas, dll)\n` +
+                    `4. Konfirmasi pemesanan & pembayaran\n\n` +
+                    `📝 *CATATAN:*\n` +
+                    `Harap simpan ID Booking (#BK${bookingId}) untuk referensi.\n` +
+                    `Anda akan menerima update via WhatsApp ini.\n\n` +
+                    `Terima kasih! 🙏`
+                );
+
+                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`;
+                window.open(whatsappUrl, '_blank');
+                
+                // Show comprehensive success message with booking ID
+                const successMessage = 
+                    `✅ BOOKING BERHASIL DISIMPAN!\n\n` +
+                    `📌 ID Booking Anda: #BK${bookingId}\n\n` +
+                    `Informasi booking telah tersimpan di database kami.\n\n` +
+                    `🔄 Silakan lanjutkan percakapan di WhatsApp untuk:\n` +
+                    `• Konfirmasi detail kamar\n` +
+                    `• Diskusi harga & fasilitas\n` +
+                    `• Proses pembayaran\n` +
+                    `• Jadwal check-in\n\n` +
+                    `⏱️ Admin akan merespon dalam 1x24 jam.\n` +
+                    `Terima kasih sudah memilih Aulia Kost! 🙏`;
+                
+                alert(successMessage);
+                
+                // Close modal after a short delay
+                setTimeout(() => {
+                    closeBookingModalFunc();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalBtnText;
+                }, 500);
+            } else {
+                throw new Error(data.message || 'Terjadi kesalahan saat menyimpan booking');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Gagal menyimpan booking: ' + error.message + '\n\nSilakan coba lagi.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+        });
     });
-
     // Event listeners for booking modal
     closeBookingModal.addEventListener('click', closeBookingModalFunc);
 
@@ -267,97 +290,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// Generate rooms for specific house
-function generateRoomsForHouse(houseNumber) {
-    const config = houseConfig[houseNumber];
-    if (!config) return [];
-
-    const rooms = [];
-    for (let i = 1; i <= config.totalRooms; i++) {
-        rooms.push({
-            number: `${houseNumber}-${i.toString().padStart(2, '0')}`,
-            price: price,
-            status: Math.random() > 0.3 ? 'available' : 'occupied', // 70% available
-            facilities: facilities
-        });
-    }
-    return rooms;
-}
-
-// Render rooms for selected house
-window.renderRooms = function(houseNumber) {
-    currentHouseNumber = houseNumber;
-    const config = houseConfig[houseNumber];
-    
-    if (!config) {
-        console.error('House number not found:', houseNumber);
-        return;
-    }
-
-    // Generate rooms for this house
-    roomsData = generateRoomsForHouse(houseNumber);
-
-    // Get container
-    const roomsSection = document.querySelector('#rooms .container');
-    if (!roomsSection) return;
-
-    // Create rooms grid HTML
-    const roomsGridHTML = `
-        <div id="view-rooms-list">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 class="section-title" style="margin: 0;">Kost ${config.name}</h2>
-                <button onclick="backToHouseSelection()" class="hero-btn" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
-                    ← Kembali
-                </button>
-            </div>
-            <div class="rooms-grid" id="roomsGrid" data-house="${houseNumber}">
-                <!-- Rooms will be inserted here -->
-            </div>
-        </div>
-    `;
-
-    // Replace content
-    roomsSection.innerHTML = roomsGridHTML;
-
-    // Get rooms grid
-    const roomsGrid = document.getElementById('roomsGrid');
-    if (!roomsGrid) return;
-
-    // Render room cards
-    roomsGrid.innerHTML = '';
-    roomsData.forEach(room => {
-        const roomCard = createRoomCard(room);
-        roomsGrid.appendChild(roomCard);
-    });
-
-    // Smooth scroll to rooms section
-    document.getElementById('rooms').scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
-
-// Back to house selection
-window.backToHouseSelection = function() {
-    const roomsSection = document.querySelector('#rooms .container');
-    if (!roomsSection) return;
-
-    roomsSection.innerHTML = `
-        <div id="view-house-selection">
-            <h2 class="section-title">Pilih Unit Rumah</h2>
-            <div class="house-container">
-                <div class="house-card" onclick="renderRooms('105')">
-                    <h2>🏠 No. 105</h2>
-                    <p>10 Kamar (2 Lantai)</p>
-                    <span class="hero-btn">Lihat Kamar</span>
-                </div>
-                <div class="house-card" data-house="121" onclick="renderRooms('121')">
-                    <h2>🏠 No. 121</h2>
-                    <p>6 Kamar (1 Lantai)</p>
-                    <span class="hero-btn">Lihat Kamar</span>
-                </div>
-            </div> 
-        </div>
-    `;
-
-    // Smooth scroll to rooms section
-    document.getElementById('rooms').scrollIntoView({ behavior: 'smooth', block: 'start' });
-};
