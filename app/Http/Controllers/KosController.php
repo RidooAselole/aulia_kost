@@ -8,19 +8,6 @@ use Illuminate\Http\Request;
 class KosController extends Controller
 {
     /**
-     * Middleware untuk protect routes
-     */
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (!session('admin_logged_in')) {
-                return redirect()->route('admin.login');
-            }
-            return $next($request);
-        });
-    }
-
-    /**
      * Store - Tambah kamar baru
      */
     public function store(Request $request)
@@ -63,9 +50,27 @@ class KosController extends Controller
      */
     public function destroy(Kos $kos)
     {
-        $kos->delete();
+        \Log::info("Attempting to delete room: {$kos->id} - {$kos->number}");
+        
+        // Check if there are any bookings for this room
+        $bookingCount = $kos->bookings()->count();
+        \Log::info("Room {$kos->id} has {$bookingCount} bookings");
+        
+        if ($bookingCount > 0) {
+            \Log::warning("Cannot delete room {$kos->id} - has {$bookingCount} active bookings");
+            return redirect()->route('admin.dashboard', ['section' => 'manage-rooms'])
+                ->with('error', 'Tidak dapat menghapus kamar karena masih ada booking. Hapus booking terlebih dahulu.');
+        }
 
-        return redirect()->route('admin.dashboard', ['section' => 'manage-rooms'])
-            ->with('success', 'Kamar berhasil dihapus');
+        try {
+            $kos->delete();
+            \Log::info("Successfully deleted room {$kos->id}");
+            return redirect()->route('admin.dashboard', ['section' => 'manage-rooms'])
+                ->with('success', 'Kamar berhasil dihapus');
+        } catch (\Exception $e) {
+            \Log::error("Error deleting room {$kos->id}: {$e->getMessage()}");
+            return redirect()->route('admin.dashboard', ['section' => 'manage-rooms'])
+                ->with('error', 'Gagal menghapus kamar: ' . $e->getMessage());
+        }
     }
 }
