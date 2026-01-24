@@ -688,14 +688,17 @@ body {
     color: var(--text-color);
 }
 
-.modal-body .modal-features {
-    list-style: none;
-    margin: 1rem 0;
+#modalBody ul, 
+.modal-features {
+    list-style: none !important; /* Memaksa penghapusan bullet */
+    list-style-type: none !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important;
 }
 
-.modal-body .modal-features li {
-    padding: 0.5rem 0;
-    color: var(--text-light);
+#modalBody ul li,
+.modal-features li {
+    list-style: none !important;
 }
 
 .modal-btn {
