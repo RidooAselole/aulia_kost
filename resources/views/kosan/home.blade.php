@@ -124,7 +124,8 @@
                         <p><strong>Email:</strong> aulia.kost@gmail.com</p>
                         <p><strong>WhatsApp:</strong> +62 812-2328-8620</p>
                         <div class="map-btn-container">
-                            <a href="https://maps.google.com/maps?q=-6.9052,107.6263" target="_blank" class="map-btn">📍 Lihat di Google Maps</a>
+                            <a href="https://www.google.com/maps/dir//Aulia+Kost+No.+105A,+Jl.+Sarimanah+No.105a,+Sarijadi,+Sukasari,+Bandung+City,+West+Java+40151/@-6.8774452,107.5848213,14z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x2e68e7e33ac35099:0x9fc518b1747c9a2b!2m2!1d107.5781565!2d-6.8762275?entry=ttu&g_ep=EgoyMDI2MDEyMS4wIKXMDSoASAFQAw%3D%3D" 
+                            target="_blank" class="map-btn">📍 Lihat di Google Maps</a>
                         </div>
                     </div>
                 </div>
