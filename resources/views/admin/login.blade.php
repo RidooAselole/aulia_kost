@@ -76,7 +76,13 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <button type="submit" class="login-btn">Login</button>
-        </form>
+
+            <div style="text-align: center; margin-top: 15px;">
+                  <a href="{{ route('password.request') }}" style="text-decoration: none; color: #007bff; font-size: 14px;">
+        Lupa Password?
+    </a>
+</div>
+        </form> 
     </div>
 </body>
 </html>
