@@ -38,9 +38,9 @@
             <h2>Menu Admin</h2>
             <ul>
                 <li><a href="{{ route('admin.dashboard', ['section' => 'dashboard']) }}" class="{{ $section == 'dashboard' ? 'active' : '' }}">Dashboard</a></li>
-                <li><a href="{{ route('admin.dashboard', ['section' => 'manage-rooms']) }}" class="{{ $section == 'manage-rooms' ? 'active' : '' }}">Kelola Kamar</a></li>
-                <li><a href="{{ route('admin.dashboard', ['section' => 'manage-bookings']) }}" class="{{ $section == 'manage-bookings' ? 'active' : '' }}">Kelola Booking</a></li>
-                <li><a href="{{ route('admin.dashboard', ['section' => 'settings']) }}" class="{{ $section == 'settings' ? 'active' : '' }}">Pengaturan</a></li>
+                <li><a href="{{ route('admin.dashboard', ['section' => 'manage-rooms']) }}" class="menu-h1 {{ $section == 'manage-rooms' ? 'active' : '' }}">Kelola Kamar</a></li>
+                <li><a href="{{ route('admin.dashboard', ['section' => 'manage-bookings']) }}" class="menu-h1 {{ $section == 'manage-bookings' ? 'active' : '' }}">Kelola Booking</a></li>
+                <li><a href="{{ route('admin.dashboard', ['section' => 'settings']) }}" class="menu-h1 {{ $section == 'settings' ? 'active' : '' }}">Pengaturan</a></li>
             </ul>
         </aside>
 
@@ -78,7 +78,7 @@
 
                 {{-- MANAGE ROOMS SECTION --}}
                 <section id="manage-rooms" class="admin-card {{ $section == 'manage-rooms' ? 'section-active' : 'hidden' }}">
-                    <h3>Kelola Kamar</h3>
+                    <h1>Kelola Kamar</h1>
                     <p>Kelola data kamar, status, dan harga kamar kosan.</p>
                     <div class="rooms-toolbar">
                         <button type="button" class="btn btn-primary" onclick="document.getElementById('roomModal').classList.remove('hidden')">+ Tambah Kamar Baru</button>
@@ -122,7 +122,7 @@
 
                 {{-- MANAGE BOOKINGS SECTION --}}
                 <section id="manage-bookings" class="admin-card {{ $section == 'manage-bookings' ? 'section-active' : 'hidden' }}">
-                    <h3>Kelola Booking</h3>
+                    <h1>Kelola Booking</h1>
                     <p>Lihat dan kelola semua booking kamar beserta status pembayaran dan approval.</p>
                     <table class="booking-table">
                         <thead>
@@ -180,7 +180,7 @@
 
                 {{-- SETTINGS SECTION --}}
                 <section id="settings" class="admin-card {{ $section == 'settings' ? 'section-active' : 'hidden' }}">
-                    <h3>Pengaturan</h3>
+                    <h1>Pengaturan</h1>
                     <form action="{{ route('admin.settings.update') }}" method="POST" id="settingsForm">
                         @csrf
                         <div class="form-group">

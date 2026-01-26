@@ -16,11 +16,6 @@ Route::get('/', [KosanController::class, 'index'])->name('home');
 // Booking submission route (public)
 Route::post('/bookings/create', [BookingController::class, 'storeFromWeb'])->name('bookings.create-web');
 
-// Test route
-Route::get('/test', function () {
-    return response()->json(['message' => 'Test route works!', 'time' => now()]);
-});
-
 // ============ ADMIN AUTH ROUTES ============
 Route::get('admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('admin/login', [AdminController::class, 'login'])->name('admin.login.post');
