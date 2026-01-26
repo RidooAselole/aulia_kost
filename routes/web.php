@@ -21,8 +21,6 @@ Route::get('/test', function () {
     return response()->json(['message' => 'Test route works!', 'time' => now()]);
 });
 
-Route::get('/kosan', [KosanController::class, 'index'])->name('kosan.index');
-
 // ============ ADMIN AUTH ROUTES ============
 Route::get('admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
 Route::post('admin/login', [AdminController::class, 'login'])->name('admin.login.post');
@@ -47,10 +45,4 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth.admin'], function () {
     Route::delete('bookings/{booking}', [BookingController::class, 'destroy'])->name('bookings.destroy');
 
     // ============ ADMIN AUTH ROUTES ============
-    Route::get('admin/login', [AdminController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('admin/login', [AdminController::class, 'login'])->name('admin.login.post');
-
-   // TAMBAHKAN KODE INI DI SINI
-   Route::get('admin/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-   Route::post('admin/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 });

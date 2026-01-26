@@ -46,7 +46,7 @@
                     @if($rooms->count() > 0)
                         @foreach($rooms as $room)
                             <div class="room-card" data-room-id="{{ $room->id }}">
-                                <div class="room-image">🏠</div>
+                                <div class="room-image"></div>
                                 <div class="room-info">
                                     <div class="room-number">Kamar {{ $room->number }}</div>
                                     <span class="room-status {{ $room->status === 'tersedia' ? 'status-available' : 'status-occupied' }}">

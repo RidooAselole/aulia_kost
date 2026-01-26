@@ -8,6 +8,10 @@
     backdrop-filter: blur(10px);
 }
 
+.login-container h2 {
+    margin-bottom: 20px;
+}
+
 .login-form {
     display: flex;
     flex-direction: column;

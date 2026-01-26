@@ -17,7 +17,7 @@
     <header class="header">
         <div class="container">
             <div class="logo">
-                <h1>🏠 Kosan Aulia - Admin Panel</h1>
+                <h1>Kosan Aulia - Admin Panel</h1>
             </div>
             <nav class="nav">
                 <a href="{{ route('home') }}">Kembali ke Website</a>
@@ -46,8 +46,7 @@
 
         <main class="admin-main">
             <div class="admin-header">
-                <h1>Selamat Datang di Dashboard Admin</h1>
-                <form action="{{ route('admin.logout') }}" method="POST" style="display: inline;">
+                <form action="{{ route('admin.logout') }}" method="POST" style="display: inline; float: right;">
                     @csrf
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
@@ -56,7 +55,7 @@
             <div class="admin-content">
                 {{-- DASHBOARD SECTION --}}
                 <section id="dashboard" class="admin-card {{ $section == 'dashboard' ? 'section-active' : 'hidden' }}">
-                    <h3>Dashboard</h3>
+                    <h1>Selamat Datang di Dashboard Admin</h1>
                     <p>Ringkasan data kosan.</p>
                     <div class="stat-cards">
                         <div class="stat-card">
