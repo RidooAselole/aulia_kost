@@ -61,7 +61,11 @@ class AdminController extends Controller
         
         // Get data dari database
         $rooms = Kos::all();
-        $bookings = Booking::with('user', 'kos')->get();
+        try {
+            $bookings = Booking::with('user', 'kos')->get();
+        } catch (\Exception $e) {
+            $bookings = collect(); // Return empty collection if table doesn't exist
+        }
 
         // Calculate deadline status untuk setiap booking
         $bookings = $bookings->map(function($booking) {
