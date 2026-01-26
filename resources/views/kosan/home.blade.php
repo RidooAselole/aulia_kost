@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Kosan Kami - Daftar Kamar</title>
+    <title>Aulia Kost</title>
     <link rel="stylesheet" href="{{ asset('css/kosan.css') }}">
 </head>
 <body>
@@ -74,12 +74,12 @@
             <div class="container">
                 <h2 class="section-title">Tentang Aulia Kost</h2>
                 <div class="about-content">
-                    <p>Kosan Kami menyediakan kost dan kamar dengan kualitas yang sama, dilengkapi dengan fasilitas lengkap untuk kenyamanan penghuni. Setiap kamar memiliki standar kualitas tinggi dengan harga terjangkau.</p>
+                    <p>Kosan Aulia menyediakan kost dan kamar dengan kualitas yang sama, dilengkapi dengan fasilitas lengkap untuk kenyamanan penghuni. Setiap kamar memiliki standar kualitas tinggi dengan harga terjangkau.</p>
                     
                     <!-- Location Info -->
                     <div class="location-info">
-                        <h3>📍 Lokasi Strategis</h3>
-                        <p style="margin-bottom: 1.5rem; color: var(--text-light);">Kosan kami berada di lokasi yang strategis dan mudah dijangkau dari berbagai kampus terkemuka di Bandung:</p>
+                        <h3>Lokasi Strategis</h3>
+                        <p style="margin-bottom: 1.5rem; color: var(--text-light);">Kosan Aulia berada di lokasi yang strategis dan mudah dijangkau dari berbagai kampus terkemuka di Bandung:</p>
                         <div class="distance-list">
                             <div class="distance-item">
                                 <div class="distance-icon">🎓</div>
@@ -174,7 +174,7 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; {{ date('Y') }} Kosan Kami. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} Aulia Kost. All rights reserved.</p>
         </div>
     </footer>
 
